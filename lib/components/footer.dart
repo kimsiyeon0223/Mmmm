@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../screens/property.dart';
+import '../screens/analysis.dart';
 
 class Footer extends StatelessWidget {
   const Footer({super.key});
@@ -20,14 +22,26 @@ class Footer extends StatelessWidget {
             icon: Icons.handshake_outlined,
             label: '자산',
             onTap: () {
-              print('자산 클릭');
+              // 자산 클릭 시 PropertyScreen으로 이동
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const PropertyScreen(),
+                ),
+              );
             },
           ),
           FooterButton(
             icon: Icons.analytics_outlined,
             label: '분석',
             onTap: () {
-              print('분석 클릭');
+              // 분석 클릭 시 AnalysisScreen으로 이동
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const AnalysisScreen(),
+                ),
+              );
             },
           ),
         ],
