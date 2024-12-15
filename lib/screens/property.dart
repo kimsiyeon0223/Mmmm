@@ -1,8 +1,190 @@
 import 'package:flutter/material.dart';
 import '../components/footer.dart';
 
-class PropertyScreen extends StatelessWidget {
+class PropertyScreen extends StatefulWidget {
   const PropertyScreen({super.key});
+
+  @override
+  State<PropertyScreen> createState() => _PropertyScreenState();
+}
+
+class _PropertyScreenState extends State<PropertyScreen> {
+  String totalAsset = '500,000,000원';
+  String monthlyBudget = '500,000,000원';
+
+  List<Map<String, String>> expenses = [
+    {'name': '에이블리', 'amount': '500,000원'},
+    {'name': '스타벅스', 'amount': '10,000원'},
+  ];
+
+  void showEditModal(
+      String title, String currentValue, Function(String) onSave) {
+    final TextEditingController controller = TextEditingController(
+        text: currentValue.replaceAll('원', '').replaceAll(',', ''));
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
+      builder: (context) {
+        return Padding(
+          padding: EdgeInsets.only(
+            top: 16,
+            left: 16,
+            right: 16,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '$title 수정',
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: controller,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  hintText: '금액을 입력하세요',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF775AF4),
+                  minimumSize: const Size(double.infinity, 48),
+                ),
+                onPressed: () {
+                  String formattedValue =
+                      '${int.parse(controller.text).toString().replaceAllMapped(
+                            RegExp(r'(\d)(?=(\d{3})+(?!\d))'),
+                            (Match m) => '${m[1]},',
+                          )}원';
+                  onSave(formattedValue);
+                  Navigator.of(context).pop();
+                },
+                child: const Text(
+                  '저장',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void showAddExpenseModal() {
+    final TextEditingController nameController = TextEditingController();
+    final TextEditingController amountController = TextEditingController();
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
+      builder: (context) {
+        return Padding(
+          padding: EdgeInsets.only(
+            top: 16,
+            left: 16,
+            right: 16,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                '지출 추가',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: nameController,
+                decoration: const InputDecoration(
+                  hintText: '지출 항목 이름',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: amountController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  hintText: '금액 입력',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF775AF4),
+                  minimumSize: const Size(double.infinity, 48),
+                ),
+                onPressed: () {
+                  String formattedAmount =
+                      '${int.parse(amountController.text).toString().replaceAllMapped(
+                            RegExp(r'(\d)(?=(\d{3})+(?!\d))'),
+                            (Match m) => '${m[1]},',
+                          )}원';
+                  setState(() {
+                    expenses.add({
+                      'name': nameController.text,
+                      'amount': formattedAmount,
+                    });
+                  });
+                  Navigator.of(context).pop();
+                },
+                child: const Text(
+                  '추가',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget buildSectionHeader(String title, String value, Function() onEdit) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: const TextStyle(
+            fontSize: 16,
+            color: Colors.black,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              value,
+              style: const TextStyle(
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            IconButton(
+              icon: const Icon(Icons.edit, color: Colors.black, size: 20),
+              onPressed: onEdit,
+            ),
+          ],
+        ),
+      ],
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -11,7 +193,6 @@ class PropertyScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        title: const SizedBox.shrink(),
         actions: const [
           Icon(Icons.notifications_none, color: Colors.black),
           SizedBox(width: 12),
@@ -75,9 +256,21 @@ class PropertyScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 30),
-              buildSectionHeader('등록 자산', '500,000,000원'),
+              buildSectionHeader(
+                '등록 자산',
+                totalAsset,
+                () => showEditModal('등록 자산', totalAsset, (newValue) {
+                  setState(() => totalAsset = newValue);
+                }),
+              ),
               const SizedBox(height: 30),
-              buildSectionHeader('등록한 이번달 예산', '500,000,000원'),
+              buildSectionHeader(
+                '등록한 이번달 예산',
+                monthlyBudget,
+                () => showEditModal('등록한 이번달 예산', monthlyBudget, (newValue) {
+                  setState(() => monthlyBudget = newValue);
+                }),
+              ),
               const SizedBox(height: 50),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -92,15 +285,13 @@ class PropertyScreen extends StatelessWidget {
                       color: Color(0xFF775AF4),
                       size: 28,
                     ),
-                    onPressed: () {
-                      print("지출 추가 버튼 클릭됨");
-                    },
+                    onPressed: showAddExpenseModal,
                   ),
                 ],
               ),
               const SizedBox(height: 16),
               Column(
-                children: List.generate(4, (index) {
+                children: expenses.map((expense) {
                   return Container(
                     margin: const EdgeInsets.only(bottom: 16),
                     padding: const EdgeInsets.all(12),
@@ -111,15 +302,15 @@ class PropertyScreen extends StatelessWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
-                          '에이블리',
-                          style: TextStyle(fontSize: 18),
+                        Text(
+                          expense['name']!,
+                          style: const TextStyle(fontSize: 18),
                         ),
                         Row(
                           children: [
-                            const Text(
-                              '500,000원',
-                              style: TextStyle(
+                            Text(
+                              expense['amount']!,
+                              style: const TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -129,41 +320,33 @@ class PropertyScreen extends StatelessWidget {
                               onPressed: () {},
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: const Color(0xFF775AF4),
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 12),
                                 minimumSize: const Size(50, 32),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(6),
                                 ),
                               ),
-                              child: const Text(
-                                '삭제',
-                                style: TextStyle(color: Colors.white),
-                              ),
+                              child: const Text('삭제',
+                                  style: TextStyle(color: Colors.white)),
                             ),
-                            const SizedBox(width: 8),
+                            const SizedBox(width: 5),
                             ElevatedButton(
                               onPressed: () {},
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: const Color(0xFF775AF4),
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 12),
                                 minimumSize: const Size(50, 32),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(6),
                                 ),
                               ),
-                              child: const Text(
-                                '메모',
-                                style: TextStyle(color: Colors.white),
-                              ),
+                              child: const Text('메모',
+                                  style: TextStyle(color: Colors.white)),
                             ),
                           ],
                         ),
                       ],
                     ),
                   );
-                }),
+                }).toList(),
               ),
               const SizedBox(height: 50),
             ],
@@ -171,39 +354,6 @@ class PropertyScreen extends StatelessWidget {
         ),
       ),
       bottomNavigationBar: const Footer(),
-    );
-  }
-
-  Widget buildSectionHeader(String title, String value) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          title,
-          style: const TextStyle(
-            fontSize: 16,
-            color: Colors.black,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              value,
-              style: const TextStyle(
-                fontSize: 32,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const Icon(
-              Icons.edit,
-              color: Colors.black,
-              size: 20,
-            ),
-          ],
-        ),
-      ],
     );
   }
 }
