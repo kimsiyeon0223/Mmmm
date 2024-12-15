@@ -85,14 +85,10 @@ class AnalysisScreen extends StatelessWidget {
               const SizedBox(height: 12),
               Column(
                 children: [
-                  buildExpenseItem(
-                      '에이블리', '40,000,000원', const Color(0xFF775AF4)),
-                  buildExpenseItem(
-                      '무신사', '40,000,000원', const Color(0xFF9B8FFB)),
-                  buildExpenseItem(
-                      '식비', '40,000,000원', const Color(0xFF8CCAF8)),
-                  buildExpenseItem(
-                      '뿌링클', '40,000,000원', const Color(0xFF66B2FF)),
+                  buildExpenseItem('에이블리', '40,000원', const Color(0xFF775AF4)),
+                  buildExpenseItem('무신사', '40,000원', const Color(0xFF9B8FFB)),
+                  buildExpenseItem('식비', '40,000원', const Color(0xFF8CCAF8)),
+                  buildExpenseItem('뿌링클', '40,000원', const Color(0xFF66B2FF)),
                 ],
               ),
               const SizedBox(height: 80),
