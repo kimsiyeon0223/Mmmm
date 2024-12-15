@@ -154,6 +154,12 @@ class _PropertyScreenState extends State<PropertyScreen> {
     );
   }
 
+  void deleteExpense(Map<String, String> expense) {
+    setState(() {
+      expenses.remove(expense);
+    });
+  }
+
   Widget buildSectionHeader(String title, String value, Function() onEdit) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -317,7 +323,7 @@ class _PropertyScreenState extends State<PropertyScreen> {
                             ),
                             const SizedBox(width: 12),
                             ElevatedButton(
-                              onPressed: () {},
+                              onPressed: () => deleteExpense(expense),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: const Color(0xFF775AF4),
                                 minimumSize: const Size(50, 32),
